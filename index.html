@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		html,
+		body{
+			width: 100%;
+			height: 100%;
+		}
+		.canvas-box{
+			width: 100%;
+			height: 100%;
+		}
+		#canvas{
+			background-color: #000;
+		}
+	</style>
+</head>
+<body>
+	<div id="canvasBox" class="canvas-box">
+		<canvas id="canvas">浏览器不支持！！！！！</canvas>
+	</div>
+	
+	<script>
+		var c = document.getElementById('canvas')
+		var cBox = document.getElementById('canvasBox')
+		var ctx = c.getContext('2d')
+		c.width = cBox.offsetWidth;  
+        c.height = cBox.offsetHeight;  
+		var maxWidth = c.width
+		var maxHeight = c.height
+		
+		var circleArray = []
+		var getRandomColor = function(){
+            return  '#' +
+                (function(color){
+                return (color +=  '0123456789abcdef'[Math.floor(Math.random()*16)])
+                  && (color.length == 6 && color != '000000') ?  color : arguments.callee(color);
+            })('');
+        }
+        // 点的构造函数
+		function Circle(color){
+			this.arcX = parseInt(Math.random()*((maxWidth-10)-10+1)+10,10);
+			this.arcY = parseInt(Math.random()*((maxWidth-10)-10+1)+10,10);
+			this.radius = parseInt(Math.random()*(4-2+1)+2,10);
+			// this.radius = 1
+			this.moveX = -Math.random()*(1-.5+1)+.5
+			this.moveY = -Math.random()*(1-.5+1)+.5
+			// console.log('x'+ "=" + this.moveX)
+			// console.log('y'+ "=" + this.moveY)
+			// 点的运动
+			this.run = function(){
+				this.arcX = this.arcX + this.moveX
+				this.arcY = this.arcY + this.moveY
+				if (this.arcX + this.radius > maxWidth || this.arcX - this.radius < 0) { //判断当前点的位置，控制在区域内
+		            this.moveX = -this.moveX; //取反来调整线路方向
+		        }
+		        if (this.arcY + this.radius > maxHeight || this.arcY - this.radius < 0) { //判断当前点的位置，控制在区域内
+		            this.moveY = -this.moveY; //取反来调整线路方向
+				}
+		        this.draw()
+			}
+			// 制造点
+			this.draw = function(){
+				ctx.beginPath();
+				ctx.fillStyle = color;
+				ctx.arc(this.arcX,this.arcY,this.radius,0, Math.PI * 2);
+				ctx.fill();
+			}
+		}
+		// 添加点数组
+		function count(){
+			for (var i = 0; i < 300; i++) {
+				circleArray.push(new Circle(getRandomColor()))
+            }
+		}
+		// 点与点连线
+		function drawLine() {  
+            for (var i = 0; i < circleArray.length; i++) {  
+                for (var j = 0; j < circleArray.length; j++) {  
+                    if (i != j) {  
+                     	if (Math.sqrt(Math.pow((circleArray[i].arcX - circleArray[j].arcX), 2) + Math.pow((circleArray[i].arcY - circleArray[j].arcY), 2)) < 100){  
+                            ctx.beginPath();  
+                            ctx.moveTo(circleArray[i].arcX, circleArray[i].arcY);  
+                            ctx.lineTo(circleArray[j].arcX, circleArray[j].arcY);  
+                            ctx.strokeStyle = "rgb(255,255,255,1)";  
+                            ctx.lineWidth = 0.2;  
+                            ctx.stroke();  
+                        }  
+                  	}
+                }  
+            }  
+        }  
+        // 初始化
+		function updateAll() {
+			// 清除画布
+            ctx.clearRect(0, 0, maxWidth, maxHeight)
+            drawLine()
+            for (var i = 0; i < circleArray.length; i++) {
+                circleArray[i].run();
+            }
+            clearTimeout(timer);
+            var timer = setTimeout(updateAll, 20)
+        }
+		window.onload = function(){
+			count()
+			updateAll()
+		}
+	</script>
+</body>
+</html>

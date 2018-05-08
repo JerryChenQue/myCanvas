@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style>
+		.canvas-box{
+			width: 1000px;
+			height:1000px;
+			margin:0 auto;
+		}
+		#canvas{
+			background-color: #f1f1f1;
+		}
+	</style>
+</head>
+<body>
+	<div id="canvasBox" class="canvas-box">
+		<canvas width="1000" height="1000" id="canvas">浏览器不支持！！！！！</canvas>
+	</div>
+	<script>
+		var c = document.getElementById("canvas")
+		var ctx = c.getContext('2d')
+		function Game(){
+			this.long = [{x:230,y:200},{x:220,y:200},{x:210,y:200}]
+			this.direction = 39
+			this.head = this.long[0]
+			this.move = function(){
+
+				this.long.splice(1,0,{x:this.head.x,y:this.head.y});
+				switch (this.direction) {
+					case 39:
+						this.head.x += 10
+						break;
+					case 38:
+						this.head.y -= 10
+						break;
+					case 37:
+						this.head.x -= 10
+						break;
+					case 40:
+						this.head.y += 10
+						break;
+				}
+				this.long.splice(this.long.length-1,1)
+				this.snack()
+				this.overGame()
+			}
+			this.overGame = function(){
+				if(this.head.x > 990 || this.head.x < 0 || this.head.y < 0 || this.head.y > 990){
+					isGame = false
+					clearInterval(time)
+					
+				}
+			}
+			this.snack = function(){
+				ctx.beginPath();
+		        ctx.fillStyle = "red"; 
+		        this.long.map((item) => {
+		        	ctx.rect(item.x,item.y,10,10);
+		        })
+		        ctx.fill();
+		        ctx.stroke();
+			}
+		}
+
+		var game = new Game()
+		document.onkeydown = function upKey(e){
+			var keyNum=window.event ? e.keyCode :e.which;   
+			switch (keyNum) {
+				case 39:
+					if(game.direction !== 37){
+						game.direction = keyNum
+					}
+					break;
+				case 38:
+					if(game.direction !== 40){
+						game.direction = keyNum
+					}
+					break;
+				case 37:
+					if(game.direction !== 39){
+						game.direction = keyNum
+					}
+					break;
+				case 40:
+					if(game.direction !== 38){
+						game.direction = keyNum
+					}
+					break;
+			}
+		}
+		var isGame = true
+		var time = setInterval(function(){
+			console.log(isGame)
+			if(isGame){
+				ctx.clearRect(0,0,1000,1000)
+			}
+			game.move()
+		}, 100)
+	</script>
+</body>
+</html>
