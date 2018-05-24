@@ -4,8 +4,8 @@
 	<title></title>
 	<style>
 		.canvas-box{
-			width: 1000px;
-			height:1000px;
+			width: 800px;
+			height:800px;
 			margin:0 auto;
 		}
 		#canvas{
@@ -15,7 +15,7 @@
 </head>
 <body>
 	<div id="canvasBox" class="canvas-box">
-		<canvas width="1000" height="1000" id="canvas">浏览器不支持！！！！！</canvas>
+		<canvas width="800" height="800" id="canvas">浏览器不支持！！！！！</canvas>
 	</div>
 	<script>
 		var c = document.getElementById("canvas")
@@ -24,8 +24,9 @@
 			this.long = [{x:230,y:200},{x:220,y:200},{x:210,y:200}]
 			this.direction = 39
 			this.head = this.long[0]
+			this.footX = 0;
+			this.footY = 0;
 			this.move = function(){
-
 				this.long.splice(1,0,{x:this.head.x,y:this.head.y});
 				switch (this.direction) {
 					case 39:
@@ -43,13 +44,22 @@
 				}
 				this.long.splice(this.long.length-1,1)
 				this.snack()
+				this.eat()
 				this.overGame()
 			}
 			this.overGame = function(){
-				if(this.head.x > 990 || this.head.x < 0 || this.head.y < 0 || this.head.y > 990){
+				if(this.head.x > 790 || this.head.x < 0 || this.head.y < 0 || this.head.y > 790){
 					isGame = false
 					clearInterval(time)
-					
+					alert('游戏结束！')
+				}
+				for (var i = 1; i < this.long.length-1; i++) {
+					if(this.head.x == this.long[i].x && this.head.y == this.long[i].y){
+						console.log(this.long)
+						isGame = false
+						clearInterval(time)
+						alert('游戏结束！')
+					}
 				}
 			}
 			this.snack = function(){
@@ -60,6 +70,26 @@
 		        })
 		        ctx.fill();
 		        ctx.stroke();
+			}
+			this.footSite = function(){
+				this.footX = parseInt(Math.random()*69+10)*10;
+				this.footY = parseInt(Math.random()*69+10)*10;
+				console.log(this.footX+'and'+this.footY)
+			}
+			this.foot = function(){
+				ctx.beginPath();
+		        ctx.fillStyle = "red";
+				ctx.rect(this.footX,this.footY,10,10);
+				ctx.fill();
+		        ctx.stroke();
+			}
+			this.eat = function(){
+				if(this.head.x == this.footX && this.head.y == this.footY){
+					this.long.push({x: this.footX, y: this.footY})
+					console.log(this.long)
+					this.footSite()
+					this.foot()
+				}	
 			}
 		}
 
@@ -90,11 +120,12 @@
 			}
 		}
 		var isGame = true
+		game.footSite()
 		var time = setInterval(function(){
-			console.log(isGame)
 			if(isGame){
-				ctx.clearRect(0,0,1000,1000)
+				ctx.clearRect(0,0,800,800)
 			}
+			game.foot()
 			game.move()
 		}, 100)
 	</script>
